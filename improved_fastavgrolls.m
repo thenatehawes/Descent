@@ -1,5 +1,5 @@
 %% Help
-% Stuff
+% Stuff I added some help to this file now.
 %
 %%
 clear; close all; clc;
