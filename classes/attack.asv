@@ -25,6 +25,66 @@ classdef attack
             
         end
         
+        function out=perform(obj,override)
+            
+            % Setup
+            N_att=length(obj.att_dice); % # of attack dice
+            N_def=length(obj.def_dice); % # of def dice
+            N_dice=N_att+N_def; % # of dice
+            res=att_res(); % premake result
+            
+            if nargin==1,
+               % If an override is not provided we randomly choose the dice
+               % side results and store them in the "override" variable
+               override=ceil(6*rand(1,N_dice)); 
+                
+            end
+            
+            %% Roll Attack
+            
+            res.miss=0;
+            res.raw_att=[0,0,0];
+            for j=1:N_att
+                
+                tmp=rolldie(obj.att_dice(j),override(j));
+        
+                if isempty(tmp)
+                    % Attack misses
+                    res(i).raw_att=[0,0,0]; % Raw attack Results stored to result
+                    res(i).miss=1;
+            
+                elseif ~res.miss
+                    % Attack Hits, keep counting
+                    res.raw_att=res.raw_att+tmp;
+                end
+
+ 
+            end
+            
+            %% Roll Def
+            
+            res.raw_def=[0,0,0];
+            for j=N_att+1:N_dice
+
+                res(i).raw_def=res(i).raw_def+rolldie(obj.def_dice(j),override(j));
+
+            end
+            
+            %% Apply Attack Mods
+            
+            attackmods=sum(obj.atk_mod);
+            res.mod_hearts=attackmods.heart_mod; % Setting these will modify res.hearts and  (etc)
+            res.mod_shield=attackmods.shield_mod;
+            res.mod_range=attackmods.range_mod
+            res.mod_condition=attackmods.condition_mod;
+            
+            %% Check Range
+            
+            %% Surge
+            
+            out=1;
+        end
+        
         function out=avg_val(obj)
             
             N_att=length(obj.att_dice);
@@ -44,45 +104,7 @@ classdef attack
             res=att_result(blank,blank,blank);
             
             for i=1:N,        
-            %% Roll Attack
             
-            res(i).miss=0;
-            res(i).raw_att=[0,0,0];
-            for j=1:N_att
-        
-                if isempty(obj.att_dice(j).side{indslist(i,j)})
-                    % Attack misses
-                    res(i).raw_att=[0,0,0]; % Raw attack Results stored to result
-                    res(i).miss=1;
-            
-                elseif ~res(i).miss
-                    % Attack Hits, keep counting
-                    res(i).raw_att=res(i).raw_att+obj.att_dice(j).side{indslist(i,j)};
-                end
-
- 
-            end
-            
-            %% Roll Def
-            
-            res(i).raw_def=[0,0,0];
-            for j=1:N_def
-
-                res(i).raw_def=res(i).raw_def+obj.def_dice(j).side{indslist(i,j)}; %
-
-            end
-            
-            %% Apply Attack Mods
-            
-            obj.atk_mod
-            
-            %% Check Range
-            
-            %% Surge
-            
-            end
-            
-            out=1;
         end
         
     end

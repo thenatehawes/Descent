@@ -44,7 +44,7 @@ mod=att_mod(atk_mod(1),atk_mod(2),atk_mod(3),[]);% [shield_mod,heart_mod,range_m
 % Create Attack Object & Run avg Val
 
 att=attack(ad,dd,range,mod,surge_directives,special);
-avgout=avg_val(att);
+avgout=perform(att);
 disp(att);
 
 

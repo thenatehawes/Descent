@@ -34,16 +34,7 @@ classdef att_mod
             
         end
         
-        function obj_out=sum(in)
-           
-            obj_out=att_mod;
-           for i=1:length(in)
-              
-               obj_out=obj_out+in(i);
-               
-           end
-            
-        end
+        function obj
         
     end
     

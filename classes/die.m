@@ -91,9 +91,13 @@ classdef die
            
         end
         
-        function out=rolldie(obj)
+        function out=rolldie(obj,override)
+           
+            if nargin==1
+                override=ceil(6*rand);
+            end
             
-           out=obj.side{ceil(6*rand)};
+           out=obj.side{override};
             
         end
         

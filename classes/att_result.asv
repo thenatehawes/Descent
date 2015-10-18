@@ -76,30 +76,14 @@ classdef att_result
         
         function obj=set.mod_hearts(obj,input)
             
-            obj.mod_hearts=input;
-            obj.hearts=obj.hearts+input;
             
-        end
-        
-        function obj=set.mod_shield(obj,input)
             
-            obj.mod_shield=input;
-            obj.shields=obj.shields+input;
             
         end
 
-        function obj=set.mod_range(obj,input)
-            
-           obj.mod_range=input;
-           obj.range=obj.range+input;
-            
-        end
-        
-        function obj=set.mod_condition(obj,input)
-            
-            obj.mod_condition=[obj.mod_condition input];
-            
-        end
+                mod_shield
+        mod_range
+        mod_condition
         
     end
     
