@@ -15,7 +15,7 @@ classdef att_result
         raw_shields
         spent_surge
         mod_hearts
-        mod_pierce
+        mod_shield
         mod_range
         mod_condition
         
@@ -51,16 +51,26 @@ classdef att_result
         
         function obj=set.raw_att(obj,input)
             
+            if length(input)==3
+            
+            obj.raw_att=input;
             obj.raw_hearts=input(1);
             obj.raw_surge=input(2);
             obj.raw_range=input(3);
+            
+            end
             
         end
         
         function obj=set.raw_def(obj,input)
             
-            obj.raw_shields=input(1);
+            if length(input)==3,
+                
+                obj.raw_def=input;
+                obj.raw_shields=input(1);
             
+            end
+                
         end
         
     end
