@@ -91,9 +91,9 @@ classdef die
            
         end
         
-        function out=rolldie(obj)
-            
-           out=obj.side{ceil(6*rand)};
+        function [out,side]=rolldie(obj)
+            side=ceil(6*rand);
+            out=obj.side{side};
             
         end
         
