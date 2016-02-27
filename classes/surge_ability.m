@@ -8,10 +8,16 @@ classdef surge_ability<att_mod
     
     methods
         
-        function obj=surge_ability(cost,hearts,pierce,range,condition)
+        function obj=surge_ability(cost,pierce,heart,range,condition)
             
-            obj=obj@att_mod(-pierce,hearts,range,0,condition);
+            obj=obj@att_mod(-pierce,heart,range,0,condition);
             obj.cost=cost;
+            
+        end
+        
+        function objout=convert(obj)
+            
+            objout=att_mod(obj.mod_shield,obj.mod_heart,obj.mod_range,obj.mod_surge,obj.mod_condition);
             
         end
         

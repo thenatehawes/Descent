@@ -173,7 +173,8 @@ classdef attack<handle
                    % You shouldn't spend this ability
                    
                 else
-                    spendsurge(obj,affordableabilities(1));
+                    spendsurge(obj,affordableabilit
+                    
                 end
                 
             end % end while

@@ -1,4 +1,4 @@
-classdef att_mod
+classdef att_mod<handle
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -33,7 +33,7 @@ classdef att_mod
             heart=moda.mod_heart+modb.mod_heart;
             range=moda.mod_range+modb.mod_range;
             surge=moda.mod_surge+modb.mod_surge;
-            condition=[moda.condition,modb.condition];
+            condition=[moda.mod_condition,modb.mod_condition];
             obj=att_mod(shield,heart,range,surge,condition);
         end
         

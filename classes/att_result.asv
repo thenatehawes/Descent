@@ -6,22 +6,22 @@ classdef att_result<handle
     % with additional display properties miss, hearts, etc..
     
     properties(SetAccess=private) % Displayed properties
-        miss=0;
-        hearts=0;
-        surge=0;
-        spent_surge=0;
-        range=0;
-        shields=0;
-        damage=0;
-        raw_hearts=0;
-        raw_surge=0;
-        raw_range=0;
-        raw_shields=0;
-        mod_hearts=0;
-        mod_shield=0;
-        mod_range=0;
-        mod_surge=0;
-        mod_condition=[];   
+        miss
+        hearts
+        surge
+        spent_surge
+        range
+        shields
+        damage
+        raw_hearts
+        raw_surge
+        raw_range
+        raw_shields
+        mod_hearts
+        mod_shield
+        mod_range
+        mod_surge
+        mod_condition   
     end
     
     properties(Hidden) % Editted properties
@@ -36,7 +36,17 @@ classdef att_result<handle
         
         function obj=att_result(miss,raw_att,raw_def)
             
-           if nargin~=0 % if nargin isn't empty
+            if nargin==0
+                
+                obj.miss=0;
+                obj.mod_hearts=0;
+                obj.mod_shield=0;
+                obj.mod_range=0;
+                obj.mod_surge=0;
+                obj.raw_att=[0,0,0];
+                obj.raw_def=[0,0,0];
+                
+            else % if nargin isn't empty
                 m=size(raw_att,1); % m&n are rows/cols of raw_att, this will fail if all 3 inputs are not of same size
                 n=size(raw_att,2);
 
@@ -85,11 +95,6 @@ classdef att_result<handle
         end
         
         function obj=set.spent_surge(obj,input)
-           
-            obj.spent_surge=input;
-            obj=update(obj);
-            
-        end
         
         function obj=set.att_mods(obj,input)
             
