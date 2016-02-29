@@ -5,7 +5,7 @@ classdef att_result<handle
     % ...hmm, perhaps att_result should just hold att_mods, raw rolls, etc.
     % with additional display properties miss, hearts, etc..
     
-    properties(SetAccess=private) % Displayed properties
+    properties(SetAccess=public) % Displayed properties
         miss=0;
         hearts=0;
         surge=0;
@@ -93,6 +93,7 @@ classdef att_result<handle
         
         function obj=set.att_mods(obj,input)
             
+            if ~isempty(input)
             obj.att_mods=input;
             input=sum(input);
             
@@ -102,6 +103,7 @@ classdef att_result<handle
             obj.mod_surge=input.mod_surge;
             
             obj=update(obj);
+            end
             
         end
         

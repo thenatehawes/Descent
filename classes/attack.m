@@ -15,9 +15,19 @@ classdef attack<handle
     methods
         
         function obj=attack(att_dice,def_dice,range,att_mod,surge_dir,special)
-           
-            obj.att_dice=att_dice;
-            obj.def_dice=def_dice;
+            
+            
+            attdie=[];
+            for i=1:length(att_dice)
+                attdie=[attdie,die(att_dice{i})];
+            end
+            defdie=[];
+            for i=1:length(def_dice)
+                defdie=[defdie,die(def_dice{i})];
+            end
+
+            obj.att_dice=attdie;
+            obj.def_dice=defdie;
             obj.range=range;
             obj.att_mod=att_mod;
             obj.surge_dir=surge_dir;
@@ -52,7 +62,7 @@ classdef attack<handle
             out=1;
         end
         
-        function out=rollattack(obj,sides)
+        function rollattack(obj,sides)
             
             %% Setup
             
@@ -60,20 +70,24 @@ classdef attack<handle
             N_def=length(obj.def_dice);
             N_dice=N_att+N_def;
             N=6^(N_dice);
+            nosurge=0;
+            if isempty(obj.surge_dir)
+                nosurge=1;
+            end
             
             % If the sides are specified beforehand, roll all the die now
             % and record the sides
             if nargin==1,
                 dice=[obj.att_dice,obj.def_dice];
-                for i=N,
-                    [~,tmp]=rolldie(dice(i));
+                for i=1:N_dice,
+                    [dc,tmp]=rolldie(dice(i));
                     sides(i)=tmp;
                 end
             end
             
             % Premake result and attach to attack
             res=att_result;
-            obj.results=res;
+            obj.result=res;
             
             %% Roll Attack
             
@@ -86,7 +100,7 @@ classdef attack<handle
                     res.raw_att=[0,0,0]; % Raw attack Results stored to result
                     res.miss=1;
             
-                elseif ~res(i).miss
+                elseif ~res.miss
                     % Attack Hits, keep counting
                     res.raw_att=res.raw_att+obj.att_dice(j).side{sides(j)};
                 end
@@ -105,15 +119,17 @@ classdef attack<handle
             
             %% Apply Attack Mods
             
-            att_res.att_mod=obj.att_mods;
+            res.att_mods=obj.att_mod;
             
             %% Check Range
             
-            if res.range<obj.range
+            if res.range<obj.range&&~nosurge
                 % Attack will miss unless surge is used
                 rangeneeded=obj.range-res.range;
-                rangeabilities=find([obj.surge_dir.range]>0); % find all surge abilities that grant enough range
-                affordable=find([obj.surge_dir.cost]<=res.surge); % find all affordable surge abilities
+                % find all surge abilities that grant enough range
+                rangeabilities=find([obj.surge_dir.mod_range]>0); 
+                % find all affordable surge abilities
+                affordable=find([obj.surge_dir.cost]<=res.surge); 
                 
                 helpfullist=intersect(rangeabilities,affordable); % ability is helpful if it gives range & is affordable
 
@@ -123,13 +139,11 @@ classdef attack<handle
                      
                 else
                     % Abilities can help
-                    
-                    % now, I have a list of abilities that can grant range and are affordable
-                    helpfulabilities=obj.surge_dir(obj.surge_dir(helpfullist)); % list of helpful abilities
-                    
-                    while rangeneeded>0||res.surge==0, % loop until you have enough range or you're out of surge
+                   
+                    while rangeneeded>0||res.surge<=0, % loop until you have enough range or you're out of surge
                         
-                        % NOTE! Must update helpfulabiliities here
+                        % now, I have a list of abilities that can grant range and are affordable
+                        helpfulabilities=obj.surge_dir(obj.surge_dir(helpfullist)); % list of helpful abilities
                         
                         % are there any single abilities which grant sufficient range?
                         singleability=find([helpfulabilities.range]==rangeneeded,1,'first');
@@ -149,31 +163,59 @@ classdef attack<handle
                             
                         end
                         
+                        % Update range needed & helpfullist
+                        affordable=find([obj.surge_dir.cost]<=res.surge); % find all affordable surge abilities
+                        rangeabilities=find([obj.surge_dir.range]>0); % find all surge abilities that grant enough range
+                        helpfullist=intersect(rangeabilities,affordable); % ability is helpful if it gives range & is affordable
+
                         rangeneeded=obj.range-res.range;
                     end %endwhile
-                    
+                
                 end %endif
+                
+            elseif res.range<obj.range&&nosurge    
+                res.miss=1;
                 
             end    
             
             %% Spend Surge
-            
+            abort=0; % this stops us from spending more surge
             pierce=1; % allow pierce abilities to be used
-            while res.surge>0
+            while res.surge>0&&~abort&&~nosurge
                 
                 affordable=find([obj.surge_dir.cost]<=res.surge); % find all affordable surge abilities
-                affordableabilities=obj.surge_dir(affordable);
                 
-                if res.shield<=0
-                    pierce=0; % disallow pierce abilities from being used
-                end
-                
-                % spend the first affordable
-                if affordableabilities(1).mod_shield<0&&pierce==0
-                   % You shouldn't spend this ability
-                   
+                if isempty(affordable)
+                    abort=1;
                 else
-                    spendsurge(obj,affordableabilities(1));
+
+                    affordableabilities=obj.surge_dir(affordable);
+
+                    if res.shields<=0
+                        pierce=0; % disallow pierce abilities from being used
+                    end
+
+
+                    % spend the first affordable
+                    k=1; % timeout variable
+                    go=1;
+                    while go
+
+                        if affordableabilities(k).mod_shield<0&&pierce==0
+                           % You shouldn't spend this ability
+                           k=k+1;                    
+                        elseif k>length(affordableabilities)
+                            % haven't found a suitable ability to spend
+                            go=0;
+                            abort=1;
+                        else
+                            % found a good ability, spend it
+                            spendsurge(obj,affordableabilities(1));
+                            go=0;
+                        end % endif
+
+                    end % end while
+                    
                 end
                 
             end % end while
@@ -183,15 +225,15 @@ classdef attack<handle
         function spendsurge(attackobj,surgeability)
             
             % Check cost
-            if surgeability.cost>attackobj.results.surge
+            if surgeability.cost>attackobj.result.surge
                 error('Surge ability costs more than available surge')
             end
             
             % Add the surge cost to results.spent_surge, results.surge will auto update
-            attackobj.results.spent_surge=attackobj.results.spent_surge+surgeability.cost;
+            attackobj.result.spent_surge=attackobj.result.spent_surge+surgeability.cost;
             % Add the surge ability to results.att_mod (hidden), this will
             % auto update the modifiers
-            attackobj.results.att_mod=[attackobj.results.att_mod,convert(surgeability)];
+            attackobj.result.att_mods=[attackobj.result.att_mods,convert(surgeability)];
             % Remove the surge directive from the list of available surge
             % directives.
             attackobj.surge_dir(attackobj.surge_dir==surgeability)=[];

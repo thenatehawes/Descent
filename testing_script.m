@@ -50,4 +50,7 @@ if all(chka==chka2)&&all(chkb==chkb2)
 else
     disp('% ...Failed')
     disp('%%%%%%%%%%%%%%%%%%')
-end    
+end
+
+att_1=attack({'b','r','r'},{'k','k'},4,[],smod1,[]);
+rollattack(att_1);
