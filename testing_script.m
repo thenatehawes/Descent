@@ -39,6 +39,7 @@ chka=[5,1,2,2,3,3,0,0,1,2,1,2,1];
 chka2=[res.hearts,res.surge,res.range,res.shields,res.damage,res.raw_hearts,res.raw_surge,res.raw_range,res.raw_shields,res.mod_hearts,res.mod_shield,res.mod_range,res.mod_surge];
 
 smod1=surge_ability(1,2,0,0,[]);
+smod2=surge_ability(1,0,0,3,[]);
 res.att_mods(end+1)=convert(smod1);
 
 chkb=[0,5,1,2,0,5,3,0,0,1,2,-1,2,1];
@@ -52,5 +53,5 @@ else
     disp('%%%%%%%%%%%%%%%%%%')
 end
 
-att_1=attack({'b','r','r'},{'k','k'},4,[],smod1,[]);
+att_1=attack({'b','r','r'},{'k','k'},4,[],[smod1,smod2],[]);
 rollattack(att_1);

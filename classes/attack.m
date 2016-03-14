@@ -140,13 +140,13 @@ classdef attack<handle
                 else
                     % Abilities can help
                    
-                    while rangeneeded>0||res.surge<=0, % loop until you have enough range or you're out of surge
+                    while rangeneeded>0&&res.surge<=0, % loop until you have enough range or you're out of surge
                         
                         % now, I have a list of abilities that can grant range and are affordable
-                        helpfulabilities=obj.surge_dir(obj.surge_dir(helpfullist)); % list of helpful abilities
+                        helpfulabilities=obj.surge_dir(helpfullist); % list of helpful abilities
                         
-                        % are there any single abilities which grant sufficient range?
-                        singleability=find([helpfulabilities.range]==rangeneeded,1,'first');
+                        % are there any single abilities which grant exactly the right range?
+                        singleability=find([helpfulabilities.mod_range]==rangeneeded,1,'first');
                         
                         if ~isempty(singleability)
                             % yes, a single ability grants enough range,
@@ -165,7 +165,7 @@ classdef attack<handle
                         
                         % Update range needed & helpfullist
                         affordable=find([obj.surge_dir.cost]<=res.surge); % find all affordable surge abilities
-                        rangeabilities=find([obj.surge_dir.range]>0); % find all surge abilities that grant enough range
+                        rangeabilities=find([obj.surge_dir.mod_range]>0); % find all surge abilities that grant enough range
                         helpfullist=intersect(rangeabilities,affordable); % ability is helpful if it gives range & is affordable
 
                         rangeneeded=obj.range-res.range;
@@ -175,6 +175,11 @@ classdef attack<handle
                 
             elseif res.range<obj.range&&nosurge    
                 res.miss=1;
+                
+            else
+                % attack hits, remove surge mods that ONLY provide range
+                rangeonly=find(obj.surge_dir.mod_range>0&&obj.surge_dir.mod_shield==0&&obj.surge_dir.mod_heart==0&&obj.surge_dir.mod_surge==0&&isempty(obj.surge_dir.mod_condition));
+                obj.surge_dir(rangeonly)=[];
                 
             end    
             
@@ -228,7 +233,7 @@ classdef attack<handle
             if surgeability.cost>attackobj.result.surge
                 error('Surge ability costs more than available surge')
             end
-            
+                
             % Add the surge cost to results.spent_surge, results.surge will auto update
             attackobj.result.spent_surge=attackobj.result.spent_surge+surgeability.cost;
             % Add the surge ability to results.att_mod (hidden), this will
