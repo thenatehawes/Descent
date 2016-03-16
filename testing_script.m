@@ -53,5 +53,5 @@ else
     disp('%%%%%%%%%%%%%%%%%%')
 end
 
-att_1=attack({'b','r','r'},{'k','k'},4,[],[smod1,smod2],[]);
-rollattack(att_1);
+att_1=attack({'b','y','y'},{'k','k'},4,[],[smod1,smod2],[]);
+rollattack(att_1,[5,5,5,2,2]);

@@ -176,6 +176,11 @@ classdef attack<handle
             elseif res.range<obj.range&&nosurge    
                 res.miss=1;
                 
+            else
+                % attack hits, remove surge mods that ONLY provide range
+                rangeonly=find([obj.surge_dir.mod_range]>0&[obj.surge_dir.mod_shield]==0&[obj.surge_dir.mod_heart]==0&[obj.surge_dir.mod_surge]==0&isempty([obj.surge_dir.mod_condition]));
+                obj.surge_dir(rangeonly)=[];
+                
             end    
             
             %% Spend Surge

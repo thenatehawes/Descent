@@ -178,7 +178,7 @@ classdef attack<handle
                 
             else
                 % attack hits, remove surge mods that ONLY provide range
-                rangeonly=find(obj.surge_dir.mod_range>0&&obj.surge_dir.mod_shield==0&&obj.surge_dir.mod_heart==0&&obj.surge_dir.mod_surge==0&&isempty(obj.surge_dir.mod_condition));
+                rangeonly=find([obj.surge_dir.mod_range]>0&[obj.surge_dir.mod_shield]==0&[obj.surge_dir.mod_heart]==0&[obj.surge_dir.mod_surge]==0&isempty([obj.surge_dir.mod_condition]));
                 obj.surge_dir(rangeonly)=[];
                 
             end    
